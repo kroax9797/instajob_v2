@@ -18,6 +18,7 @@ function Navbar({ openForm, openContact, scrollToAbout }) {
   );
 }
 
+
 function Hero({ openForm }) {
   return (
     <section className="w-full min-h-svh py-20 px-4">
@@ -26,7 +27,7 @@ function Hero({ openForm }) {
           InstaJob: Instant Hiring, Instant Updates.
         </h2>
         <p className="max-w-3xl mx-auto text-lg text-accent-foreground sm:text-xl mb-10">
-          Say goodbye to ghosted applications. Our AI-powered platform gives **real-time feedback** to candidates, and lets recruiters **focus only on top profiles**.
+          Say goodbye to ghosted applications. Our AI-powered platform gives real-time feedback to candidates, and lets recruiters focus only on top profiles.
         </p>
 
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 px-4">
@@ -64,6 +65,7 @@ function Hero({ openForm }) {
   );
 }
 
+
 function AboutUs({ aboutRef }) {
   return (
     <section ref={aboutRef} className="py-24 px-6 bg-gray-100 text-center">
@@ -76,6 +78,7 @@ function AboutUs({ aboutRef }) {
     </section>
   )
 }
+
 
 function ContactDialog({ isOpen, onClose }) {
   return (
@@ -99,7 +102,7 @@ function ContactDialog({ isOpen, onClose }) {
 }
 
 
-function AuthDialog({ type, isOpen, onClose }) {
+function AuthDialog({ type, isOpen, onClose , BASE_URL}) {
   const [formData, setFormData] = useState({});
   const navigate = useNavigate();
 
@@ -144,7 +147,7 @@ function AuthDialog({ type, isOpen, onClose }) {
         });
 
         response = await fetch(
-          `http://localhost:8000/register/applicant?${queryParams}`,
+          `${BASE_URL}/register/applicant?${queryParams}`,
           {
             method: "POST",
             body: dataToSend,
@@ -168,7 +171,7 @@ function AuthDialog({ type, isOpen, onClose }) {
         });
 
         response = await fetch(
-          `http://localhost:8000/register/recruiter?${queryParams}`,
+          `${BASE_URL}/register/recruiter?${queryParams}`,
           { method: "POST" }
         );
 
@@ -185,7 +188,7 @@ function AuthDialog({ type, isOpen, onClose }) {
           email: formData.email,
           password: formData.password,
         })
-        response = await fetch(`http://localhost:8000/login/applicant?${queryParams}`, {
+        response = await fetch(`${BASE_URL}/login/applicant?${queryParams}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
         });
@@ -203,7 +206,7 @@ function AuthDialog({ type, isOpen, onClose }) {
           email: formData.email,
           password: formData.password,
         })
-        response = await fetch(`http://localhost:8000/login/recruiter?${queryParams}`, {
+        response = await fetch(`${BASE_URL}/login/recruiter?${queryParams}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
         });
@@ -276,7 +279,9 @@ function Footer() {
   );
 }
 
+
 function Home() {
+  const BASE_URL = import.meta.env.VITE_BACKEND_API_BASE_URL ;
   const [formType, setFormType] = useState(null)
   const [contactOpen, setContactOpen] = useState(false)
   const aboutRef = useRef(null)
@@ -294,14 +299,17 @@ function Home() {
   }
 
   return (
-    <div className="flex min-h-svh flex-col">
+    <div className="grid grid-rows-[auto_1fr_auto] h-screen">
       <Navbar openForm={openForm} openContact={openContact} scrollToAbout={scrollToAbout} />
-      <main className="flex-grow">
+      
+      <main className="overflow-auto">
         <Hero openForm={openForm} />
+        {/* AboutUs will not be shown by default, only when scrolled to */}
         <AboutUs aboutRef={aboutRef} />
-        {formType && <AuthDialog type={formType} isOpen={!!formType} onClose={closeForm} />}
+        {formType && <AuthDialog type={formType} isOpen={!!formType} onClose={closeForm} BASE_URL={BASE_URL}/>}
         <ContactDialog isOpen={contactOpen} onClose={closeContact} />
       </main>
+
       <Footer />
     </div>
   );

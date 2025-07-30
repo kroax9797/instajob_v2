@@ -13,7 +13,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
+import CreateJobPostDialog from "./components/CreateJobPostDialog";
+
 export default function RecruiterDashboard() {
+  const BASE_URL = import.meta.env.VITE_BACKEND_API_BASE_URL ;
   const [selectedJob, setSelectedJob] = useState(null);
   const navigate = useNavigate()
   const location = useLocation();
@@ -24,7 +27,7 @@ export default function RecruiterDashboard() {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const res = await fetch(`http://localhost:8000/recruit/posted_jobs?email=${recruiter.email}`);
+        const res = await fetch(`${BASE_URL}/recruit/posted_jobs?email=${recruiter.email}`);
         if (!res.ok) throw new Error("Failed to fetch jobs");
         const data = await res.json();
         setJobPosts(data.jobs || []);
@@ -70,12 +73,7 @@ export default function RecruiterDashboard() {
               {recruiter?.email} • {recruiter?.company}
             </p>
           </div>
-          <Button
-            className="rounded-full h-10 w-10 p-0 shadow bg-secondary hover:bg-primary hover:text-white"
-            onClick={() => alert("Open Create Job Modal")}
-          >
-            <Plus className="h-5 w-5" />
-          </Button>
+            <CreateJobPostDialog recruiterEmail={recruiter.email}/>
         </div>
 
         {/* Job Posts Section */}
@@ -103,7 +101,7 @@ export default function RecruiterDashboard() {
                       <div className="flex items-center justify-between">
                         <CardTitle 
                         className="text-lg"
-                        onClick={() => navigate(`/recruiter/dashboard/${job._id}`, { state: recruiter })}
+                        onClick={() => navigate(`/recruiter/dashboard/${job._id}`, { state: {recruiter , job} })}
                         >
                             {job.title}
                         </CardTitle>
